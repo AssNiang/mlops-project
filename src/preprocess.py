@@ -10,6 +10,10 @@ from nltk.corpus import stopwords
 from spellchecker import SpellChecker
 import spacy
 
+nltk.download("stopwords")
+nltk.download("averaged_perceptron_tagger")
+nltk.download("punkt")
+
 
 # Dropping missing values and duplicated observations
 def drop_missing_and_duplicates(data):

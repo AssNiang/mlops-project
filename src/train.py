@@ -6,7 +6,6 @@ from matplotlib import pyplot as plt
 import seaborn as sns
 import mlflow
 import pandas as pd
-import pendulum
 from sklearn.model_selection import train_test_split
 import numpy as np
 import plotly.graph_objects as go
