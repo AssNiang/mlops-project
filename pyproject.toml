@@ -1,0 +1,11 @@
+[project]
+name = "ecommerce_label"
+
+ignore = [
+"E501", # Line too long
+]
+
+
+[tool.ruff]
+# max length
+line-length = 120

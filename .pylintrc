@@ -1,0 +1,7 @@
+[MASTER]
+
+disable=
+ E1101, #Instance of 'tuple' has no 'data' member (no-member)
+ fixme
+
+max-line-length=150
