@@ -10,11 +10,5 @@ psutil
 scikit_learn
 seaborn
 xgboost
-time
-os
-sys
-re
-string
 nltk
 spacy
-types
