@@ -12,5 +12,6 @@ seaborn
 xgboost
 nltk
 spacy
-pytest  
 pyspellchecker
+pytest  
+pylint
