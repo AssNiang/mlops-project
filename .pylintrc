@@ -1,4 +1,5 @@
-[MASTER]
+[MASTER][MASTER]
+init-hook='import sys; from pathlib import Path; sys.path.append(str(Path.cwd()))'
 
 disable=
  E1101, #Instance of 'tuple' has no 'data' member (no-member)

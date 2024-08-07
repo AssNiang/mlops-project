@@ -4,10 +4,6 @@ from typing import Optional
 import pandas as pd
 from loguru import logger
 
-# import sys
-# from pathlib import Path
-# sys.path.append(str(Path.cwd()))
-
 
 def load_data(
     dataset_filepath: str, columns_to_lower: Optional[bool] = False

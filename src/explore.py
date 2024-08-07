@@ -54,7 +54,7 @@ def visualize_and_save_class_frequencies(data_e, data_h, data_b, data_c, save_pa
         height=500,
         width=800,
         showlegend=True,
-        title=dict(text=text_title, x=0.5, y=0.95),
+        title={"text": text_title, "x": 0.5, "y": 0.95},
     )
 
     # Ensure the save_path directory exists
@@ -133,10 +133,11 @@ def visualize_and_save_word_distribution(data_e, data_h, data_b, data_c, save_pa
     None
     """
     # Distribution of number of words in description
-    data_e_word = data_e["description"].str.split().map(lambda x: len(x))
-    data_h_word = data_h["description"].str.split().map(lambda x: len(x))
-    data_b_word = data_b["description"].str.split().map(lambda x: len(x))
-    data_c_word = data_c["description"].str.split().map(lambda x: len(x))
+    data_e_word = data_e["description"].str.split().str.len()
+    data_h_word = data_h["description"].str.split().str.len()
+    data_b_word = data_b["description"].str.split().str.len()
+    data_c_word = data_c["description"].str.split().str.len()
+
 
     fig, ax = plt.subplots(2, 2, figsize=(10, 8.4), sharey=False)
     sns.histplot(x=data_e_word, bins=20, ax=ax[0, 0]).set_title("Class: Electronics")
@@ -181,31 +182,16 @@ def visualize_and_save_avg_word_length_distribution(
     Returns:
     None
     """
+    def average_word_length(description):
+        words = description.split()
+        return np.mean([len(word) for word in words])
+
     # Distribution of average word-length in description
-    data_e_avg = (
-        data_e["description"]
-        .str.split()
-        .apply(lambda x: [len(i) for i in x])
-        .map(lambda x: np.mean(x))
-    )
-    data_h_avg = (
-        data_h["description"]
-        .str.split()
-        .apply(lambda x: [len(i) for i in x])
-        .map(lambda x: np.mean(x))
-    )
-    data_b_avg = (
-        data_b["description"]
-        .str.split()
-        .apply(lambda x: [len(i) for i in x])
-        .map(lambda x: np.mean(x))
-    )
-    data_c_avg = (
-        data_c["description"]
-        .str.split()
-        .apply(lambda x: [len(i) for i in x])
-        .map(lambda x: np.mean(x))
-    )
+    data_e_avg = data_e["description"].apply(average_word_length)
+    data_h_avg = data_h["description"].apply(average_word_length)
+    data_b_avg = data_b["description"].apply(average_word_length)
+    data_c_avg = data_c["description"].apply(average_word_length)
+
 
     fig, ax = plt.subplots(2, 2, figsize=(10, 8.4), sharey=False)
     sns.histplot(x=data_e_avg, bins=20, ax=ax[0, 0]).set_title("Class: Electronics")

@@ -4,7 +4,12 @@ import sys
 from pathlib import Path
 
 sys.path.append(str(Path.cwd()))
+
+#pylint: disable=wrong-import-position
+
 from src.make_dataset import load_data
+
+#pylint: enable=wrong-import-position
 
 # load data
 data = load_data("data/ecommerceDataset.csv")

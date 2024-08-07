@@ -1,20 +1,18 @@
 """Training Module"""
 
 import time
+import os
 from loguru import logger
 from matplotlib import pyplot as plt
 import seaborn as sns
 import mlflow
 import pandas as pd
-from sklearn.model_selection import train_test_split
 import numpy as np
 import plotly.graph_objects as go
-import os
 from sklearn import metrics
 from sklearn.metrics import accuracy_score
 from sklearn.linear_model import RidgeClassifier
-from sklearn.model_selection import ParameterGrid
-import mlflow
+from sklearn.model_selection import train_test_split, ParameterGrid
 
 
 def split_data(
@@ -35,21 +33,18 @@ def split_data(
     data_val (pd.DataFrame): Validation set including features and target.
     data_test (pd.DataFrame): Test set including features and target.
     """
-    # Feature-target split
-    X, y = data.drop(target_column, axis=1), data[target_column]
-
     # Train-test split (from complete data)
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=test_size, random_state=random_state
+    x_train, x_test, y_train, y_test = train_test_split(
+        data.drop(target_column, axis=1), data[target_column], test_size=test_size, random_state=random_state
     )
-    data_train = pd.concat([X_train, y_train], axis=1)
+    data_train = pd.concat([x_train, y_train], axis=1)
 
     # Validation-test split (from test data)
-    X_val, X_test, y_val, y_test = train_test_split(
-        X_test, y_test, test_size=val_size, random_state=random_state
+    x_val, x_test, y_val, y_test = train_test_split(
+        x_test, y_test, test_size=val_size, random_state=random_state
     )
-    data_val = pd.concat([X_val, y_val], axis=1)
-    data_test = pd.concat([X_test, y_test], axis=1)
+    data_val = pd.concat([x_val, y_val], axis=1)
+    data_test = pd.concat([x_test, y_test], axis=1)
 
     return data_train, data_val, data_test
 
@@ -79,7 +74,7 @@ def plot_data_split_sizes(data_train, data_val, data_test, save_path):
         height=500,
         width=800,
         showlegend=True,
-        title=dict(text=text_title, x=0.5, y=0.95),
+        title={"text": text_title, "x": 0.5, "y": 0.95},
     )
 
     # Save the figure as an image in the specified folder
@@ -133,42 +128,39 @@ def normalize_split_data(data_train, data_val, data_test, text_normalizer):
 
 
 # Function to return summary of baseline models
-def score(X_train, y_train, X_val, y_val, names, models, experiment_id, current_date):
+def score(config):
     """
-    Trains and evaluates a list of models, logs metrics to MLflow, and returns a DataFrame with model performance.
+    Trains models and records their training and validation accuracy scores.
 
-    Parameters:
-    - X_train (pd.DataFrame or np.array): Training feature data.
-    - y_train (pd.Series or np.array): Training labels.
-    - X_val (pd.DataFrame or np.array): Validation feature data.
-    - y_val (pd.Series or np.array): Validation labels.
-    - names (list of str): List of model names.
-    - models (list of sklearn.base.ClassifierMixin): List of model instances to evaluate.
-    - experiment_id (int): MLflow experiment ID for logging.
-    - current_date (datetime): Current date for naming MLflow runs.
+    Args:
+    config (dict): Configuration dictionary containing training, validation data,
+                   model names, models, experiment ID, and current date.
 
     Returns:
-    - pd.DataFrame: DataFrame containing model names and their training and validation accuracies.
+    pd.DataFrame: DataFrame containing classifier names, training accuracy, and validation accuracy.
     """
-    score_df, score_train, score_val = pd.DataFrame(), [], []
+    results = {
+        "Classifier": [],
+        "Training accuracy": [],
+        "Validation accuracy": []
+    }
     start_time = time.time()
 
-    for name, model in zip(names, models):
+    for name, model in zip(config["names"], config["models"]):
         with mlflow.start_run(
-            run_name=f"{current_date.strftime('%Y%m%d_%H%m%S')}-ecommerce-{name}",
-            experiment_id=experiment_id,
+            run_name=f"{config['current_date'].strftime('%Y%m%d_%H%m%S')}-ecommerce-{name}",
+            experiment_id=config["experiment_id"],
             tags={"version": "v1", "priority": "P1"},
             description="ecommerce text classification",
-        ) as mlf_run:
-            model.fit(X_train, y_train)
+        ):
+            model.fit(config["x_train"], config["y_train"])
             logger.info(f"Trained {name} model")
+            train_accuracy = accuracy_score(config["y_train"], model.predict(config["x_train"]))
+            val_accuracy = accuracy_score(config["y_val"], model.predict(config["x_val"]))
 
-            y_train_pred, y_val_pred = model.predict(X_train), model.predict(X_val)
-            train_accuracy = accuracy_score(y_train, y_train_pred)
-            val_accuracy = accuracy_score(y_val, y_val_pred)
-
-            score_train.append(train_accuracy)
-            score_val.append(val_accuracy)
+            results["Classifier"].append(name)
+            results["Training accuracy"].append(train_accuracy)
+            results["Validation accuracy"].append(val_accuracy)
 
             logger.info(f"{name} - Training accuracy: {train_accuracy}")
             logger.info(f"{name} - Validation accuracy: {val_accuracy}")
@@ -179,30 +171,21 @@ def score(X_train, y_train, X_val, y_val, names, models, experiment_id, current_
             mlflow.log_metric("val_accuracy", val_accuracy)
             mlflow.sklearn.log_model(model, "model")
 
-    score_df["Classifier"] = names
-    score_df["Training accuracy"] = score_train
-    score_df["Validation accuracy"] = score_val
+    score_df = pd.DataFrame(results)
     score_df.sort_values(by="Validation accuracy", ascending=False, inplace=True)
 
-    elapsed_time = time.time() - start_time
-    logger.info(f"Completed scoring in {elapsed_time} seconds")
+    logger.info(f"Completed scoring in {time.time() - start_time} seconds")
 
     return score_df
 
 
-def tune_ridge_classifier(
-    X_train_tfidf, y_train, X_val_tfidf, y_val, experiment_id, current_date
-):
+def tune_ridge_classifier(config):
     """
     Tune the RidgeClassifier model using grid search and log the metrics to MLflow.
 
     Parameters:
-    - X_train_tfidf (pd.DataFrame): Training feature set in TF-IDF format.
-    - y_train (pd.Series): Training labels.
-    - X_val_tfidf (pd.DataFrame): Validation feature set in TF-IDF format.
-    - y_val (pd.Series): Validation labels.
-    - experiment_id (int): MLflow experiment ID.
-    - current_date (datetime): Current date to format MLflow run names.
+    - config (dict): Configuration dictionary containing training and validation data,
+                     experiment ID, and current date.
 
     Returns:
     - best_model_tfidf (RidgeClassifier): Best RidgeClassifier model found.
@@ -217,7 +200,7 @@ def tune_ridge_classifier(
     }
 
     # Initialize variables to track the best model, parameters, and score
-    best_model_ridge, best_params_ridge, best_score_ridge = None, None, 0
+    best_params_ridge, best_score_ridge = None, 0
 
     # Iterate over all combinations of the parameter grid
     for count, g in enumerate(ParameterGrid(params_ridge), 1):
@@ -226,13 +209,15 @@ def tune_ridge_classifier(
 
         # Set the parameters and fit the model
         ridge_classifier.set_params(**g)
-        ridge_classifier.fit(X_train_tfidf, y_train)
+        ridge_classifier.fit(config["x_train_tfidf"], config["y_train"])
 
         # Make predictions and calculate accuracy scores
-        y_train_pred = ridge_classifier.predict(X_train_tfidf)
-        y_val_pred = ridge_classifier.predict(X_val_tfidf)
-        score_train = accuracy_score(y_train, y_train_pred)
-        score_val = accuracy_score(y_val, y_val_pred)
+        score_train = accuracy_score(
+            config["y_train"],
+            ridge_classifier.predict(config["x_train_tfidf"]))
+        score_val = accuracy_score(
+            config["y_val"],
+            ridge_classifier.predict(config["x_val_tfidf"]))
 
         # Calculate runtime
         time_stop = time.time()
@@ -247,11 +232,11 @@ def tune_ridge_classifier(
 
         # Log metrics to mlflow
         with mlflow.start_run(
-            run_name=f"{current_date.strftime('%Y%m%d_%H%m%S')}-ecommerce-RidgeClassifier_grid_{count}",
-            experiment_id=experiment_id,
+            run_name=f"{config['current_date'].strftime('%Y%m%d_%H%m%S')}-ecommerce-RidgeClassifier_grid_{count}",
+            experiment_id=config["experiment_id"],
             tags={"version": "v1", "priority": "P1"},
             description="ecommerce text classification. Fine tuning the RidgeClassifier model",
-        ) as mlf_run:
+        ):
             mlflow.log_params(g)
             mlflow.log_metric("train_accuracy", score_train)
             mlflow.log_metric("val_accuracy", score_val)
@@ -261,7 +246,7 @@ def tune_ridge_classifier(
     # Train the best model with the best parameters
     best_model_tfidf = RidgeClassifier()
     best_model_tfidf.set_params(**best_params_ridge)
-    best_model_tfidf.fit(X_train_tfidf, y_train)
+    best_model_tfidf.fit(config["x_train_tfidf"], config["y_train"])
 
     logger.info(f"Best model: {best_model_tfidf}")
     logger.info(f"Best parameters: {best_params_ridge}")
@@ -269,11 +254,11 @@ def tune_ridge_classifier(
 
     # Log the best model to mlflow
     with mlflow.start_run(
-        run_name=f"{current_date.strftime('%Y%m%d_%H%m%S')}-ecommerce-Best_RidgeClassifier_Model",
-        experiment_id=experiment_id,
+        run_name=f"{config['current_date'].strftime('%Y%m%d_%H%m%S')}-ecommerce-Best_RidgeClassifier_Model",
+        experiment_id=config["experiment_id"],
         tags={"version": "v1", "priority": "P1"},
         description="ecommerce text classification. Best RidgeClassifier model",
-    ) as mlf_run:
+    ):
         mlflow.log_params(best_params_ridge)
         mlflow.log_metric("best_val_accuracy", best_score_ridge)
         mlflow.sklearn.log_model(best_model_tfidf, "best_model")
@@ -281,106 +266,72 @@ def tune_ridge_classifier(
     return best_model_tfidf, best_params_ridge, best_score_ridge
 
 
+
 # Function to compute and print confusion matrix
-def conf_mat(
-    y_test,
-    y_test_pred,
-    figsize=(10, 8),
-    font_scale=1.2,
-    annot_kws_size=16,
-    save_path=None,
-):
+def conf_mat(config):
     """
     Computes and prints the confusion matrix for the given true and predicted labels.
 
     Parameters:
-    - y_test (array-like): True labels of the test set.
-    - y_test_pred (array-like): Predicted labels by the model.
-    - figsize (tuple, optional): Size of the figure to be displayed. Default is (10, 8).
-    - font_scale (float, optional): Scaling factor for font size in the heatmap. Default is 1.2.
-    - annot_kws_size (int, optional): Font size for annotations in the heatmap. Default is 16.
-    - save_path (str, optional): Path to save the confusion matrix plot as an image file. If None, the plot will not be saved.
+    - config (dict): Configuration dictionary containing true labels, predicted labels,
+                     and optional parameters for the plot.
 
     Returns:
     - None: Displays and optionally saves the confusion matrix plot.
     """
-    class_names = [
-        0,
-        1,
-        2,
-        3,
-    ]  # ['Electronics', 'Household', 'Books', 'Clothing & Accessories']
-    tick_marks_y = [0.5, 1.5, 2.5, 3.5]
-    tick_marks_x = [0.5, 1.5, 2.5, 3.5]
-    confusion_matrix = metrics.confusion_matrix(y_test, y_test_pred)
+    # Compute confusion matrix
+    confusion_matrix = metrics.confusion_matrix(config["y_test"], config["y_test_pred"])
     confusion_matrix_df = pd.DataFrame(confusion_matrix, range(4), range(4))
-    plt.figure(figsize=figsize)
-    sns.set(font_scale=font_scale)  # label size
+
+    # Plot confusion matrix
+    plt.figure(figsize=config.get("figsize", (10, 8)))
+    sns.set(font_scale=config.get("font_scale", 1.2))
     plt.title("Confusion Matrix")
     sns.heatmap(
-        confusion_matrix_df, annot=True, annot_kws={"size": annot_kws_size}, fmt="d"
-    )  # font size
-    plt.yticks(tick_marks_y, class_names, rotation="vertical")
-    plt.xticks(tick_marks_x, class_names, rotation="horizontal")
+        confusion_matrix_df,
+        annot=True,
+        annot_kws={"size": config.get("annot_kws_size", 16)},
+        fmt="d"
+    )
+    plt.yticks([0.5, 1.5, 2.5, 3.5], [0, 1, 2, 3], rotation="vertical")
+    plt.xticks([0.5, 1.5, 2.5, 3.5], [0, 1, 2, 3], rotation="horizontal")
     plt.ylabel("True label")
     plt.xlabel("Predicted label")
     plt.grid(False)
+
     # Save the plot if save_path is provided
-    if save_path:
-        plt.savefig(save_path, bbox_inches="tight")
+    if config.get("save_path"):
+        plt.savefig(config["save_path"], bbox_inches="tight")
     plt.show()
 
 
-def evaluate_model(
-    best_model,
-    X_train_vec,
-    y_train,
-    X_test_vec,
-    y_test,
-    experiment_id,
-    current_date,
-    conf_mat,
-    save_path,
-):
+def evaluate_model(config):
     """
     Evaluate the model on the test set, log results to MLflow, and plot confusion matrix.
 
     Parameters:
-    - best_model (sklearn.base.ClassifierMixin): The trained model to be evaluated.
-    - X_train_vec (pd.DataFrame or np.array): Training features.
-    - y_train (pd.Series or np.array): Training labels.
-    - X_test_vec (pd.DataFrame or np.array): Test features.
-    - y_test (pd.Series or np.array): Test labels.
-    - experiment_id (int): MLflow experiment ID.
-    - current_date (datetime): Current date to format MLflow run names.
-    - conf_mat (function): Function to plot the confusion matrix.
+    - config (dict): Configuration dictionary containing all parameters needed for evaluation.
     """
     # Prediction and evaluation on the test set
     logger.info("Starting prediction and evaluation on the test set")
-    best_model.fit(X_train_vec, y_train)
-    y_test_pred = best_model.predict(X_test_vec)
-    score_test = accuracy_score(y_test, y_test_pred)
+    config["best_model"].fit(config["x_train_vec"], config["y_train"])
+    y_test_pred = config["best_model"].predict(config["x_test_vec"])
+    score_test = accuracy_score(config["y_test"], y_test_pred)
     logger.info(f"Test accuracy: {score_test}")
 
     # Log the test accuracy to MLflow
     with mlflow.start_run(
-        run_name=f"{current_date.strftime('%Y%m%d_%H%m%S')}-ecommerce-Best_Model_Test_Evaluation",
-        experiment_id=experiment_id,
+        run_name=f"{config['current_date'].strftime('%Y%m%d_%H%m%S')}-ecommerce-Best_Model_Test_Evaluation",
+        experiment_id=config["experiment_id"],
         tags={"version": "v1", "priority": "P1"},
         description="ecommerce text classification. Best model test evaluation",
-    ) as mlf_run:
+    ):
         mlflow.log_metric("test_accuracy", score_test)
-        mlflow.sklearn.log_model(best_model, "best_model")
+        mlflow.sklearn.log_model(config["best_model"], "best_model")
 
     # Plot the confusion matrix and save it as an image
-
-    # Save the figure as an image in the specified folder
-    conf_matrix_path = os.path.join(save_path, "confusion_matrix.png")
-    conf_mat(
-        y_test,
-        y_test_pred,
-        figsize=(10, 8),
-        font_scale=1.2,
-        annot_kws_size=16,
-        save_path=conf_matrix_path,
-    )
+    conf_mat({
+        "y_test": config["y_test"],
+        "y_test_pred": y_test_pred,
+        "save_path": os.path.join(config["save_path"], "confusion_matrix.png")
+    })
