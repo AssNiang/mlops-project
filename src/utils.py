@@ -29,5 +29,5 @@ def save_object_with_pickle(
     pickle_out = open(object_path, "wb")
     pickle.dump(object_to_save, pickle_out)
     pickle_out.close()
-    
+
     logger.info("Done object record successfully")

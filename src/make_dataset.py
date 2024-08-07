@@ -9,7 +9,9 @@ from loguru import logger
 # sys.path.append(str(Path.cwd()))
 
 
-def load_data(dataset_filepath: str, columns_to_lower: Optional[bool] = False) -> pd.DataFrame:
+def load_data(
+    dataset_filepath: str, columns_to_lower: Optional[bool] = False
+) -> pd.DataFrame:
     """Fetch dataset from a csv file by the given dataset_filepath
 
     Args:
@@ -27,7 +29,7 @@ def load_data(dataset_filepath: str, columns_to_lower: Optional[bool] = False) -
         raise ValueError("Dataset name, like ``dataset_name``, must be defined!")
     data = pd.read_csv(f"{dataset_filepath}", names=["label", "description"])
     data = data[["description", "label"]]
-    
+
     # Calculate memory usage and dataset shape
     memory_usage = "{:.2f} MB".format(data.memory_usage().sum() / (1024 * 1024))
     # Log memory usage

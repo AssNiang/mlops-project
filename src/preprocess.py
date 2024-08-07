@@ -39,19 +39,24 @@ def drop_missing_and_duplicates(data):
 
     # Dropping observations with missing values
     logger.info("Dropping observations with missing values")
-    data.dropna(inplace=True)  
+    data.dropna(inplace=True)
 
     # Dropping duplicate observations
     logger.info("Dropping duplicate observations")
-    data.drop_duplicates(inplace=True)  
+    data.drop_duplicates(inplace=True)
 
     # Resetting index
     logger.info("Resetting index")
-    data.reset_index(drop=True, inplace=True)  
+    data.reset_index(drop=True, inplace=True)
 
     # Manual encoding of labels
     logger.info("Encoding of labels")
-    label_dict = {"Electronics": 0, "Household": 1, "Books": 2, "Clothing & Accessories": 3}
+    label_dict = {
+        "Electronics": 0,
+        "Household": 1,
+        "Books": 2,
+        "Clothing & Accessories": 3,
+    }
     data.replace({"label": label_dict}, inplace=True)
 
     # Log dataset shape
@@ -101,7 +106,9 @@ def remove_punctuation(text):
         text: text with punctuation removed
     """
     punct_str = string.punctuation
-    punct_str = punct_str.replace("'", "")  # discarding apostrophe from the string to keep the contractions intact
+    punct_str = punct_str.replace(
+        "'", ""
+    )  # discarding apostrophe from the string to keep the contractions intact
     return text.translate(str.maketrans("", "", punct_str))
 
 
@@ -162,9 +169,7 @@ def remove_http(text):
 
 
 # List of acronyms
-ACRONYMS_URL = (
-    "https://raw.githubusercontent.com/sugatagh/E-commerce-Text-Classification/main/JSON/english_acronyms.json"
-)
+ACRONYMS_URL = "https://raw.githubusercontent.com/sugatagh/E-commerce-Text-Classification/main/JSON/english_acronyms.json"
 acronyms_dict = pd.read_json(ACRONYMS_URL, typ="series")
 acronyms_list = list(acronyms_dict.keys())
 
@@ -191,9 +196,7 @@ def convert_acronyms(text):
 
 
 # List of contractions
-CONTRACTIONS_URL = (
-    "https://raw.githubusercontent.com/sugatagh/E-commerce-Text-Classification/main/JSON/english_contractions.json"
-)
+CONTRACTIONS_URL = "https://raw.githubusercontent.com/sugatagh/E-commerce-Text-Classification/main/JSON/english_contractions.json"
 contractions_dict = pd.read_json(CONTRACTIONS_URL, typ="series")
 contractions_list = list(contractions_dict.keys())
 
@@ -532,7 +535,9 @@ def remove_additional_stopwords(text):
     Returns:
         text: text with additional stopwords removed
     """
-    return " ".join([word for word in regexp.tokenize(text) if word not in additional_stops])
+    return " ".join(
+        [word for word in regexp.tokenize(text) if word not in additional_stops]
+    )
 
 
 def text_normalizer(text):

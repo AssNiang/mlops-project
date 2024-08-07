@@ -43,26 +43,35 @@ def visualize_and_save_class_frequencies(data_e, data_h, data_b, data_c, save_pa
     values = np.array([len(data_e), len(data_h), len(data_b), len(data_c)])
     labels = ["Electronics", "Household", "Books", "Clothing & Accessories"]
     fig = go.Figure(
-        data=[go.Pie(values=values, labels=labels, hole=0.5, textinfo="percent", title=" ")]
+        data=[
+            go.Pie(
+                values=values, labels=labels, hole=0.5, textinfo="percent", title=" "
+            )
+        ]
     )
     text_title = "Comparison of class frequencies"
     fig.update_layout(
-        height=500, width=800, showlegend=True, title=dict(text=text_title, x=0.5, y=0.95)
+        height=500,
+        width=800,
+        showlegend=True,
+        title=dict(text=text_title, x=0.5, y=0.95),
     )
 
     # Ensure the save_path directory exists
     os.makedirs(save_path, exist_ok=True)
-    
+
     # Save the figure as an image in the specified folder
-    image_path = os.path.join(save_path, 'class_frequencies_pie_chart.png')
+    image_path = os.path.join(save_path, "class_frequencies_pie_chart.png")
     logger.info(f"Saving figure in {image_path}")
     fig.write_image(image_path)
 
     # Show the figure
     fig.show()
-    
-    
-def visualize_and_save_character_distribution(data_e, data_h, data_b, data_c, save_path):
+
+
+def visualize_and_save_character_distribution(
+    data_e, data_h, data_b, data_c, save_path
+):
     """
     Function to visualize the distribution of the number of characters in descriptions and save the figure as an image.
 
@@ -86,7 +95,9 @@ def visualize_and_save_character_distribution(data_e, data_h, data_b, data_c, sa
     sns.histplot(x=data_e_char, bins=20, ax=ax[0, 0]).set_title("Class: Electronics")
     sns.histplot(x=data_h_char, bins=20, ax=ax[0, 1]).set_title("Class: Household")
     sns.histplot(x=data_b_char, bins=20, ax=ax[1, 0]).set_title("Class: Books")
-    sns.histplot(x=data_c_char, bins=20, ax=ax[1, 1]).set_title("Class: Clothing & Accessories")
+    sns.histplot(x=data_c_char, bins=20, ax=ax[1, 1]).set_title(
+        "Class: Clothing & Accessories"
+    )
 
     fig.suptitle("Distribution of number of characters in description")
     for i in range(4):
@@ -100,13 +111,13 @@ def visualize_and_save_character_distribution(data_e, data_h, data_b, data_c, sa
     # Ensure the save_path directory exists
     os.makedirs(save_path, exist_ok=True)
     # Save the figure as an image in the specified folder
-    image_path = os.path.join(save_path, 'distribution_characters.png')
-    fig.savefig(image_path, bbox_inches='tight')
+    image_path = os.path.join(save_path, "distribution_characters.png")
+    fig.savefig(image_path, bbox_inches="tight")
 
     # Show the figure
     plt.show()
-    
-    
+
+
 def visualize_and_save_word_distribution(data_e, data_h, data_b, data_c, save_path):
     """
     Function to visualize the distribution of the number of words in descriptions and save the figure as an image.
@@ -131,7 +142,9 @@ def visualize_and_save_word_distribution(data_e, data_h, data_b, data_c, save_pa
     sns.histplot(x=data_e_word, bins=20, ax=ax[0, 0]).set_title("Class: Electronics")
     sns.histplot(x=data_h_word, bins=20, ax=ax[0, 1]).set_title("Class: Household")
     sns.histplot(x=data_b_word, bins=20, ax=ax[1, 0]).set_title("Class: Books")
-    sns.histplot(x=data_c_word, bins=20, ax=ax[1, 1]).set_title("Class: Clothing & Accessories")
+    sns.histplot(x=data_c_word, bins=20, ax=ax[1, 1]).set_title(
+        "Class: Clothing & Accessories"
+    )
 
     fig.suptitle("Distribution of number of words in description")
     for i in range(4):
@@ -145,14 +158,16 @@ def visualize_and_save_word_distribution(data_e, data_h, data_b, data_c, save_pa
     # Ensure the save_path directory exists
     os.makedirs(save_path, exist_ok=True)
     # Save the figure as an image in the specified folder
-    image_path = os.path.join(save_path, 'distribution_words.png')
-    fig.savefig(image_path, bbox_inches='tight')
+    image_path = os.path.join(save_path, "distribution_words.png")
+    fig.savefig(image_path, bbox_inches="tight")
 
     # Show the figure
     plt.show()
-    
-    
-def visualize_and_save_avg_word_length_distribution(data_e, data_h, data_b, data_c, save_path):
+
+
+def visualize_and_save_avg_word_length_distribution(
+    data_e, data_h, data_b, data_c, save_path
+):
     """
     Function to visualize the distribution of average word-length in descriptions and save the figure as an image.
 
@@ -167,16 +182,38 @@ def visualize_and_save_avg_word_length_distribution(data_e, data_h, data_b, data
     None
     """
     # Distribution of average word-length in description
-    data_e_avg = data_e["description"].str.split().apply(lambda x: [len(i) for i in x]).map(lambda x: np.mean(x))
-    data_h_avg = data_h["description"].str.split().apply(lambda x: [len(i) for i in x]).map(lambda x: np.mean(x))
-    data_b_avg = data_b["description"].str.split().apply(lambda x: [len(i) for i in x]).map(lambda x: np.mean(x))
-    data_c_avg = data_c["description"].str.split().apply(lambda x: [len(i) for i in x]).map(lambda x: np.mean(x))
+    data_e_avg = (
+        data_e["description"]
+        .str.split()
+        .apply(lambda x: [len(i) for i in x])
+        .map(lambda x: np.mean(x))
+    )
+    data_h_avg = (
+        data_h["description"]
+        .str.split()
+        .apply(lambda x: [len(i) for i in x])
+        .map(lambda x: np.mean(x))
+    )
+    data_b_avg = (
+        data_b["description"]
+        .str.split()
+        .apply(lambda x: [len(i) for i in x])
+        .map(lambda x: np.mean(x))
+    )
+    data_c_avg = (
+        data_c["description"]
+        .str.split()
+        .apply(lambda x: [len(i) for i in x])
+        .map(lambda x: np.mean(x))
+    )
 
     fig, ax = plt.subplots(2, 2, figsize=(10, 8.4), sharey=False)
     sns.histplot(x=data_e_avg, bins=20, ax=ax[0, 0]).set_title("Class: Electronics")
     sns.histplot(x=data_h_avg, bins=20, ax=ax[0, 1]).set_title("Class: Household")
     sns.histplot(x=data_b_avg, bins=20, ax=ax[1, 0]).set_title("Class: Books")
-    sns.histplot(x=data_c_avg, bins=20, ax=ax[1, 1]).set_title("Class: Clothing & Accessories")
+    sns.histplot(x=data_c_avg, bins=20, ax=ax[1, 1]).set_title(
+        "Class: Clothing & Accessories"
+    )
 
     fig.suptitle("Distribution of average word-length in description")
     for i in range(4):
@@ -190,8 +227,8 @@ def visualize_and_save_avg_word_length_distribution(data_e, data_h, data_b, data
     # Ensure the save_path directory exists
     os.makedirs(save_path, exist_ok=True)
     # Save the figure as an image in the specified folder
-    image_path = os.path.join(save_path, 'distribution_avg_word_length.png')
-    fig.savefig(image_path, bbox_inches='tight')
+    image_path = os.path.join(save_path, "distribution_avg_word_length.png")
+    fig.savefig(image_path, bbox_inches="tight")
 
     # Show the figure
     plt.show()
