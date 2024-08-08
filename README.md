@@ -2,7 +2,6 @@
 MLOps EPT
 
 
-```markdown
 # Projet de Classification de Textes de Biens de Consommation
 
 ## Description
@@ -22,46 +21,41 @@ Voici un aperçu des principaux dossiers et fichiers dans ce repository :
 ├── .pylintrc                         # Configuration de pylint pour l'analyse statique du code
 ├── README.md                         # Ce fichier
 ├── api/
-│   └── main.py                       # Point d'entrée principal pour l'API
+│   └── main.py                       # Point d'entrée principal pour l'API (FastAPI)
 ├── data/
 │   └── ecommerceDataset.csv          # Dataset utilisé pour l'entraînement et la validation
-├── ecommerce_text_classification.sh  # Script shell pour l'exécution du projet
+├── ecommerce_text_classification.sh  # Script shell pour l'exécution du notebook. Le résultat esst enregistré dans le dossier logs.
 ├── logs/
 │   └── 2024/08/
-│       └── 20240808-0120-e-commerce-text-classification-tf-idf-artifact.ipynb
-│           # Notebook de log pour la classification de texte
+│       └── 20240808-0120-e-commerce-text-classification-tf-idf-artifact.ipynb   # Notebook de log pour la classification de texte
 ├── models/
 │   ├── classifier.pkl                # Modèle de classification entraîné
 │   └── tfidf_vectorizer.pkl          # Vectoriseur TF-IDF utilisé pour la transformation des textes
 ├── notebooks/
-│   └── e-commerce-text-classification-tf-idf.ipynb
-│       # Notebook pour la classification de texte avec TF-IDF
+│   └── e-commerce-text-classification-tf-idf.ipynb   # Notebook pour la classification de texte
 ├── pages/
 │   ├── classify.py                   # Page Streamlit pour la classification des biens
 │   └── dataset.py                    # Page Streamlit pour afficher le dataset
 ├── pyproject.toml                    # Configuration du projet Python (dépendances, etc.)
-├── reports/
+├── reports/                          # Divers rapports et graphiques
 │   ├── class_frequencies_pie_chart.png
 │   ├── comparison_train_val_test_sizes_pie_chart.png
 │   ├── confusion_matrix.png
 │   ├── distribution_avg_word_length.png
 │   ├── distribution_characters.png
 │   └── distribution_words.png
-│       # Divers rapports et graphiques
+│       
 ├── requirements.txt                  # Liste des dépendances Python du projet
 ├── settings/
-│   ├── __init__.py                   # Initialisation du module settings
 │   └── params.py                     # Paramètres de configuration pour le projet
 ├── src/
-│   ├── __init__.py                   # Initialisation du module src
 │   ├── explore.py                    # Scripts pour l'exploration des données
-│   ├── make_dataset.py               # Scripts pour charger et préparer les données
-│   ├── preprocess.py                 # Scripts pour la normalisation des textes
+│   ├── make_dataset.py               # Scripts pour charger les données
+│   ├── preprocess.py                 # Scripts pour la préparation des données et la normalisation des textes
 │   ├── train.py                      # Scripts pour l'entraînement des modèles
 │   └── utils.py                      # Fonctions utilitaires pour le projet
 ├── streamlit_deploy.py               # Point d'entrée pour l'application Streamlit
 ├── tests/
-│   ├── __init__.py                   # Initialisation du module tests
 │   ├── test_dataset.py               # Tests pour les fonctionnalités liées aux données
 │   └── test_text_normalizer.py       # Tests pour la normalisation des textes
 ```
@@ -135,4 +129,3 @@ Pour toute question, veuillez me contacter sur [v](nianga@ept.sn).
 
 ## Références
 https://www.kaggle.com/code/sugataghosh/e-commerce-text-classification-tf-idf-word2vec
-```
