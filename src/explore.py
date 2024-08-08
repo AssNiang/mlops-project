@@ -46,19 +46,19 @@ def visualize_and_save_class_frequencies(data_e, data_h, data_b, data_c, save_pa
                 values=np.array([len(data_e), len(data_h), len(data_b), len(data_c)]),
                 labels=["Electronics", "Household", "Books", "Clothing & Accessories"],
                 hole=0.5,
+                title=" ",
                 textinfo="percent",
-                title=" "
             )
         ]
     )
     fig.update_layout(
-        height=500,
         width=800,
-        showlegend=True,
+        height=500,
         title={
             "text": "Comparison of class frequencies",
             "x": 0.5, "y": 0.95
         },
+        showlegend=True,
     )
 
     # Ensure the save_path directory exists
