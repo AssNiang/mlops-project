@@ -8,6 +8,10 @@ MLOps EPT
 
 Ce projet est une application de classification de biens de consommation utilisant des techniques de traitement du langage naturel (NLP) et de machine learning. Il comprend des étapes de prétraitement des données, d'entraînement de modèles, et d'évaluation de performance. L'interface utilisateur est construite avec Streamlit pour la classification en temps réel.
 
+## Support de présentation canva
+
+[Présentation MLOps : Classifiez des biens de consommation](https://www.canva.com/design/DAGNOgBf44g/YZKTTFNj6TNruYDTkm3kTA/edit?utm_content=DAGNOgBf44g&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
+
 ## Structure du Repository
 
 Voici un aperçu des principaux dossiers et fichiers dans ce repository :
