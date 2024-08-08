@@ -1,3 +1,5 @@
+"""Streamlit Deploy Module"""
+
 import streamlit as st
 
 

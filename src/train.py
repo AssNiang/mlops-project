@@ -60,12 +60,14 @@ def plot_data_split_sizes(data_train, data_val, data_test, save_path):
     save_path (str): The folder where the image will be saved.
     """
     # Comparison of sizes of training set, validation set, and test set
-    values = np.array([len(data_train), len(data_val), len(data_test)])
-    labels = ["Training set", "Validation Set", "Test set"]
     fig = go.Figure(
         data=[
             go.Pie(
-                values=values, labels=labels, hole=0.5, textinfo="percent", title=" "
+                values=np.array([len(data_train), len(data_val), len(data_test)]),
+                labels=["Training set", "Validation Set", "Test set"],
+                hole=0.5,
+                textinfo="percent",
+                title=" "
             )
         ]
     )
