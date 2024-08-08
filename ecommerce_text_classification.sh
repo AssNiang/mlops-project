@@ -12,7 +12,7 @@ mkdir -p ${LOGS_DIR}
 echo "================================== Start house price training ====================================="
 papermill notebooks/e-commerce-text-classification-tf-idf.ipynb \
 "${LOGS_DIR}/${EXECUTION_DATE}-e-commerce-text-classification-tf-idf-artifact.ipynb" \
--k python39 --report-mode --log-output --no-progress-bar
+-k python3 --report-mode --log-output --no-progress-bar
 
 if [ $? != 0 ]; then
   echo "ERROR: failure during training!"
