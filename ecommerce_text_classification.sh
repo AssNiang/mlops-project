@@ -10,8 +10,8 @@ LOGS_DIR=${PROJECT_DIR}/logs/${YEAR}/${MONTH}
 mkdir -p ${LOGS_DIR}
 
 echo "================================== Start house price training ====================================="
-papermill notebooks/01-house-price-prediction.ipynb \
-"${LOGS_DIR}/${EXECUTION_DATE}-house-price-artifact.ipynb" \
+papermill notebooks/e-commerce-text-classification-tf-idf.ipynb \
+"${LOGS_DIR}/${EXECUTION_DATE}-e-commerce-text-classification-tf-idf-artifact.ipynb" \
 -k python39 --report-mode --log-output --no-progress-bar
 
 if [ $? != 0 ]; then

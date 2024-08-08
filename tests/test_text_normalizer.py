@@ -1,4 +1,4 @@
-"""Test text normalizer."""
+"""Test text normalizer Module"""
 
 import sys
 from pathlib import Path

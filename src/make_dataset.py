@@ -27,7 +27,7 @@ def load_data(
     data = data[["description", "label"]]
 
     # Calculate memory usage and dataset shape
-    memory_usage = "{:.2f} MB".format(data.memory_usage().sum() / (1024 * 1024))
+    memory_usage = f"{data.memory_usage().sum() / (1024 * 1024):.2f} MB"
     # Log memory usage
     logger.info(f"Memory usage: {memory_usage}")
     # Log dataset shape

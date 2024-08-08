@@ -16,3 +16,4 @@ pyspellchecker
 pytest  
 pylint
 fastapi
+streamlit

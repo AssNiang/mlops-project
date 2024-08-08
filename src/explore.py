@@ -49,12 +49,14 @@ def visualize_and_save_class_frequencies(data_e, data_h, data_b, data_c, save_pa
             )
         ]
     )
-    text_title = "Comparison of class frequencies"
     fig.update_layout(
         height=500,
         width=800,
         showlegend=True,
-        title={"text": text_title, "x": 0.5, "y": 0.95},
+        title={
+            "text": "Comparison of class frequencies",
+            "x": 0.5, "y": 0.95
+        },
     )
 
     # Ensure the save_path directory exists

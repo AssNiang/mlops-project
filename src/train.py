@@ -69,12 +69,14 @@ def plot_data_split_sizes(data_train, data_val, data_test, save_path):
             )
         ]
     )
-    text_title = "Comparison of sizes of training set, validation set and test set"
     fig.update_layout(
         height=500,
         width=800,
         showlegend=True,
-        title={"text": text_title, "x": 0.5, "y": 0.95},
+        title={
+            "text": "Comparison of sizes of training set, validation set and test set",
+            "x": 0.5, "y": 0.95
+        },
     )
 
     # Save the figure as an image in the specified folder
