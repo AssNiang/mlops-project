@@ -121,11 +121,11 @@ Les contributions sont les bienvenues !
 
 ## Licence
 
-Ce projet est sous la licence [MIT](LICENSE).
+
 
 ## Contact
 
-Pour toute question, veuillez me contacter sur [v](nianga@ept.sn).
+Pour toute question, veuillez me contacter par mail sur nianga@ept.sn.
 
 ## Références
 https://www.kaggle.com/code/sugataghosh/e-commerce-text-classification-tf-idf-word2vec
